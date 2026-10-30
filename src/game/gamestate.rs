@@ -1,15 +1,12 @@
 use std::{fs, path::Path};
 
 use crate::{
-    audio::audio_handler::Audio,
-    game::{
+    audio::audio_handler::Audio, game::{
         entities::{Entity, EntityEvent::*},
         entity_behaviour::death_behaviour,
         interactables::Interactable,
         map_grid::MapGrid,
-    },
-    parser::map_parser::parse_map,
-    render::RendererData,
+    }, menu::menu_handler::KeyBinds, parser::map_parser::parse_map, render::RendererData,
 };
 
 use super::map::Map;
@@ -81,7 +78,7 @@ impl Game {
         }
     }
 
-    pub fn update(&mut self, window: &Window, renderer_data: &RendererData, audio: &mut Audio) {
+    pub fn update(&mut self, window: &Window, renderer_data: &RendererData, audio: &mut Audio, key_binds: &KeyBinds) {
         //update all interactables and add possible spawn events
         let mut interactables = std::mem::take(&mut self.interactables);
         let mut interactables_spawns = Vec::new();
@@ -95,7 +92,7 @@ impl Game {
 
         let mut entity_spawns = Vec::new();
         //update player
-        let event = self.player.update(window, &self.map, renderer_data, audio);
+        let event = self.player.update(window, &self.map, renderer_data, audio, key_binds);
         //add possible spawn events
         entity_spawns.extend(event);
 

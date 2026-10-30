@@ -7,7 +7,7 @@ mod parser;
 mod render;
 
 use crate::audio::audio_handler::Audio;
-use crate::menu::menu_handler::{AppState, Menu};
+use crate::menu::menu_handler::{AppState, Menu, KeyBinds};
 use crate::render::{RendererData, render_init};
 use minifb::{Key, KeyRepeat, Window, WindowOptions};
 use std::f64::consts::PI;
@@ -27,6 +27,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut last_time = Instant::now();
     let mut frame_count = 0;
     let mut fps_value;
+    let mut key_binds = KeyBinds::load();
 
     let mut window = match Window::new(
         "DoomSquad",
@@ -89,7 +90,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 } else if game.player.hp <= 0.0 {
                     app_state = AppState::GameOver;
                 } else {
-                    game.update(&window, &renderer_data, &mut audio);
+                    game.update(&window, &renderer_data, &mut audio, &key_binds);
                     render::draw_screen(&mut buffer, &renderer_data, &game);
 
                     frame_count += 1;
@@ -125,6 +126,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     app_state = AppState::StartScreen;
                 } else {
                     app_state = menu.update_and_draw_game_over(&mut window, &mut buffer, &mut game);
+                }
+            }
+
+            AppState::KeyBindings => {
+                window.set_cursor_visibility(true);
+
+                if escape_clicked {
+                    app_state = AppState::StartScreen;
+                } else {
+                    app_state = menu.update_and_draw_key_bindings(
+                        &mut window,
+                        &mut buffer,
+                        &mut key_binds,
+                    );
                 }
             }
 
